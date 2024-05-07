@@ -27,6 +27,9 @@ Access files like this:
 * http://172.23.128.1:8080/File.pdf
 
 ### React App
+
+Don't forget to `npm i`!
+
 To run the development server:
 
 ```bash
