@@ -1,0 +1,47 @@
+@import '../../styles/bootstrap-vars.scss';
+
+.UserProgressStep {
+  color: white;
+  display: flex;
+  align-items: center;
+  cursor: default;
+
+  &.UserStepCompleted {
+    opacity: 0.6;
+  }
+
+  &.CurrentUserStep {
+    opacity: 1;
+    font-weight: 700;
+  }
+
+  .UserDocumentStep {
+    margin-left: 6px;
+    height: 1em;
+    width: 1em;
+    border: 1px solid white;
+    border-radius: 50%;
+    color: #666;
+
+    & .StepCheck {
+      opacity: 0;
+      position: relative;
+      top: -4px;
+      left: -1px;
+    }
+
+    &.StepCompleted {
+      background-color: white;
+      color: #666;
+
+      & .StepCheck {
+        opacity: 1;
+      }
+    }
+
+    &.CurrentStep {
+      background-color: $primary;
+      color: white;
+    }
+  }
+}

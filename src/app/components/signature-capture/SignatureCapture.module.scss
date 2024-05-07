@@ -1,0 +1,92 @@
+@import '../../styles/bootstrap-vars.scss';
+$side-bar-width: 350px;
+$base-z-index: 2000;
+
+.SignatureCaptureComponent {
+  position: absolute;
+  z-index: $base-z-index;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  color: black;
+
+  .SignatureCaptureBody {
+    display: flex;
+    flex: 1 1 auto;
+    background: #bbb;
+
+    .SignatureCaptureProgress {
+      min-width: $side-bar-width;
+      max-width: $side-bar-width;
+      flex: 0 0 auto;
+      background: #eee;
+    }
+
+    .SignatureCaptureDocument {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      background-color: #bbb;
+      text-align: center;
+
+      .SignatureCaptureDocumentPane {
+        flex: 1 1 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .SignatureCaptureDocumentActions {
+        flex: 0 0 auto;
+      }
+
+      iframe {
+        height: 100%;
+        padding-top: 20px;
+        min-width: 800px;
+      }
+    }
+  }
+
+  .SignatureCaptureFooter {
+    display: flex;
+    flex: 0;
+    background-color: #666;
+
+    .SignatureCaptureFooterQuit {
+      min-width: $side-bar-width;
+      max-width: $side-bar-width;
+      flex: 0 0 auto;
+
+      Button:not(:hover) {
+        background: white;
+        color: $danger;
+      }
+    }
+
+    .SignatureCaptureFooterProgress {
+      display: flex;
+      flex: 1 1 auto;
+      justify-content: space-around;
+      align-items: center;
+    }
+  }
+
+  .TopazCanvasBackdrop {
+    position: absolute;
+    z-index: $base-z-index + 1;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0,0,0,0.6);
+  }
+
+  .TopazOffcanvas {
+    top: 0;
+    width: 600px;
+    z-index: $base-z-index + 2;
+  }
+}
