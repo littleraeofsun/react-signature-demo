@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BeginCapture, ClearCapture, EndCapture, SignaturePreview$ } from "./_topaz.service";
-import { CropOutWhiteSpace, GetSampleSignature } from "./_image.service";
+import { BeginCapture, ClearCapture, EndCapture, SignaturePreview$ } from "./services/_topaz.service";
+import { CropOutWhiteSpace, GetSampleSignature } from "./services/_image.service";
 import styles from './TopazCapture.module.scss';
-import Image from "next/image";
 
 export interface TopazCaptureProps {
   /** Yields the base64 string data of the accepted signature */
@@ -68,32 +67,38 @@ export function TopazCapture({onCompleted}: TopazCaptureProps) {
           <button className="btn btn-outline-primary ms-3" onClick={useSampleSignature}>Use Sample Signature</button>
         </div>
       }
-      { (captureState === CaptureState.CapturingSignature || captureState === CaptureState.ClearingSignature || captureState === CaptureState.SignatureCaptured) &&
+      { (captureState === CaptureState.CapturingSignature || captureState === CaptureState.ClearingSignature) &&
         <div className={styles.TopazCaptureAcquisition}>
-          { (captureState === CaptureState.CapturingSignature || captureState === CaptureState.ClearingSignature) &&
-            <p>Please use the signature pad to sign and submit your signatue below. This signature will be applied to any documents that you willfuly acknowledge in the next step.</p>
-          }
-          { captureState === CaptureState.SignatureCaptured &&
-            <p>Here is a preview of your digital signature. If you are satisfied, click <b>Accept Signature</b> to proceed to the document review.<br/><br/>
-            If you would like to re-enter your signature, click <b>Recapture Signature</b>.</p>
-          }
+          <p>Please use the signature pad to sign and submit your signatue below.
+            This signature will be applied to any documents that you willfuly acknowledge in the next step.</p>
+
           { previewSignature &&
-            <div className={styles.TopazSignaturePreview + ' mb-3 text-center ' + (captureState === CaptureState.SignatureCaptured ? styles.FinalPreview : '') }>
+            <div className={styles.TopazSignaturePreview + ' mb-3 text-center '}>
               <img src={previewSignature} alt="Signature Preview" onLoad={processFinalSignature} />
             </div>
           }
-          { (captureState === CaptureState.CapturingSignature || captureState === CaptureState.ClearingSignature) &&
-            <div className="text-end mt-2">
-              <button className="btn btn-outline-primary" onClick={() => setCaptureState(CaptureState.ClearingSignature)}>Clear</button>
-              <button className="btn btn-primary ms-2" onClick={() => setCaptureState(CaptureState.SignatureCaptured)}>Submit</button>
+          
+          <div className="text-end mt-2">
+            <button className="btn btn-outline-primary" onClick={() => setCaptureState(CaptureState.ClearingSignature)}>Clear</button>
+            <button className="btn btn-primary ms-2" onClick={() => setCaptureState(CaptureState.SignatureCaptured)}>Submit</button>
+          </div>
+        </div>
+      }
+      { captureState === CaptureState.SignatureCaptured &&
+        <div className={styles.TopazCaptureAcquisition}>
+          <p>Here is a preview of your digital signature. If you are satisfied, click <b>Accept Signature</b> to proceed to the document review.</p>
+          <p>If you would like to re-enter your signature, click <b>Recapture Signature</b>.</p>
+
+          { previewSignature &&
+            <div className={`${styles.TopazSignaturePreview} ${styles.FinalPreview} mb-3 text-center`}>
+              <img src={previewSignature} alt="Signature Preview" onLoad={processFinalSignature} />
             </div>
           }
-          { captureState === CaptureState.SignatureCaptured &&
-            <div className="text-end mt-2">
-              <button className="btn btn-outline-primary" onClick={() => setCaptureState(CaptureState.ClearingSignature)}>Recapture Signature</button>
-              <button className="btn btn-primary ms-2" onClick={() => _onSignatureAccepted(finalSignature ?? '')}>Accept Signature</button>
-            </div>
-          }
+
+          <div className="text-end mt-2">
+            <button className="btn btn-outline-primary" onClick={() => setCaptureState(CaptureState.ClearingSignature)}>Recapture Signature</button>
+            <button className="btn btn-primary ms-2" onClick={() => _onSignatureAccepted(finalSignature ?? '')}>Accept Signature</button>
+          </div>
         </div>
       }
     </div>

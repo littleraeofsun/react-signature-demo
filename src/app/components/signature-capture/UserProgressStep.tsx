@@ -1,6 +1,6 @@
 "use client";
 
-import { SignatureCaptureDocument, SignatureProfile } from "@/lib/interfaces";
+import { SignatureCaptureDocument, SignatureProfile, SignatureProfileDocument } from "@/lib/interfaces";
 import styles from './UserProgressStep.module.scss';
 
 interface UserProgressStepProperties {
@@ -24,27 +24,32 @@ export const UserProgressStep = ({userProfile, isCurrentProfile, isProfileComple
       title = `${userProfile.profileDescription} is currently signing documents.`;
       mainClasses.push(styles.CurrentUserStep);
     }
+    const buildContext = (docProfile: SignatureProfileDocument, docIndex: number): { document?: SignatureCaptureDocument , classes: string, title: string } => {      
+      const document = documents.find(x => x.documentKey === docProfile.documentKey);
+      const classes = [styles.UserDocumentStep];
+      let title = ` has not yet begun signing `;
+      if ((isCurrentProfile && completedDocumentIndices.includes(docIndex)) || isProfileCompleted) {
+        classes.push(styles.StepCompleted);
+        title = ` has finished signing `;
+      }
+      if (isCurrentProfile && currentDocumentIndex === docIndex) {
+        classes.push(styles.CurrentStep);
+        title = ` is currently signing `;
+      }
+      title = `${userProfile.profileDescription}${title}${document?.documentDescription}.`;
+
+      return { document, classes: classes.join(' '), title };
+    }
 
     return (
       <div className={mainClasses.join(' ')}>
         <div className={styles.UserTitle} title={title}>{ userProfile.profileDescription } Signatures</div>
         {
           userProfile.documentProfiles.map((docProfile, i) => {
-            const document = documents.find(x => x.documentKey === docProfile.documentKey);
-            const docClasses = [styles.UserDocumentStep];
-            let titleInfixText = ` has not yet begun signing `;
-            if ((isCurrentProfile && completedDocumentIndices.includes(i)) || isProfileCompleted) {
-              docClasses.push(styles.StepCompleted);
-              titleInfixText = ` has finished signing `;
-            }
-            if (isCurrentProfile && currentDocumentIndex === i) {
-              docClasses.push(styles.CurrentStep);
-              titleInfixText = ` is currently signing `;
-            }
-
+            const { document, classes, title } = buildContext(docProfile, i);
             if (document) {
               return(
-                <div key={i} className={docClasses.join(' ')} title={`${userProfile.profileDescription}${titleInfixText}${document.documentDescription}.`}><i className={styles.StepCheck + " bi bi-check"}></i></div>
+                <div key={i} className={classes} title={title}><i className={styles.StepCheck + " bi bi-check"}></i></div>
               );
             }
           })

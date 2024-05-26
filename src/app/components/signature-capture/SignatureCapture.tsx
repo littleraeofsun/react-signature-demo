@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { updateAtIndex } from '@/lib/array.utilities';
 import { BaseSignatureDocument, SignatureCaptureContext, SignatureProfile } from '@/lib/interfaces';
-import { AggregateSignaturePages, GenerateSignaturePages, GeneratedSignaturePage, PrepareDocumentResult, SignedDocumentResult } from './_document.service';
+import { AggregateSignaturePages, GenerateSignaturePages, GeneratedSignaturePage, PrepareDocumentResult, SignedDocumentResult } from './services/_document.service';
 import { Spinner } from '../Spinner';
 import { DocumentStep } from './DocumentStep';
 import { UserProgressStep } from './UserProgressStep';
@@ -76,6 +76,30 @@ export const SignatureCapture = ({ context, onQuit, onCompleted }: SignatureCapt
     }
   }, [finalDocs]);
 
+  // template producing methods
+  const generateDocumentSteps = () => {
+    return currentUser?.documentProfiles.map((doc, i) => {
+      const originalDocument = context.documents.find(d => d.documentKey === doc.documentKey);
+      const signedPages = (currentPageSets[i] ?? []).map((page, i) => page.hasBeenSigned ? i : -1).filter(x => x >= 0);
+      return (
+        <DocumentStep key={i} document={originalDocument} isCurrentDocument={i === currentDocumentPageSetIndex}
+          currentPageIndex={currentDocumentPageIndex} signedPageIndices={signedPages}
+          docClicked={() => onDocumentClicked(i)} stepClicked={(step) => onDocumentPageStepClicked(i, step)} />
+      );
+    });
+  }
+  const generateUserSteps = () => {
+    return context.userProfiles.map((user, i) => {
+      const profileCompleted = currentUserIndex > i || (currentUserIndex === i && isLastDocument && isLastPage && !!currentPage?.hasBeenSigned);
+      const completedDocuments = (context.userProfiles[i]?.documentProfiles ?? []).map((_, i) => (profileCompleted || i < currentDocumentPageSetIndex || (i === currentDocumentPageSetIndex && currentPageSetCompleted)) ? i : -1).filter(x => x >= 0);
+      return (
+        <UserProgressStep key={i} userProfile={user} isCurrentProfile={currentUserIndex === i}
+          isProfileCompleted={profileCompleted} completedDocumentIndices={completedDocuments}
+          documents={context.documents} currentDocumentIndex={currentDocumentPageSetIndex} />
+      )
+    });
+  }
+
   // local event handlers
   const onDocumentClicked = (docIndex: number) => {
     setCurrentDocumentPageSetIndex(docIndex);
@@ -136,17 +160,12 @@ export const SignatureCapture = ({ context, onQuit, onCompleted }: SignatureCapt
         <div className={styles.SignatureCaptureProgress + ' p-4'}>
           <p className="h3">{currentUser?.profileDescription} Signatures</p>
           {
-            currentUser?.documentProfiles.map((doc, i) => {
-              const originalDocument = context.documents.find(d => d.documentKey === doc.documentKey);
-              const signedPages = (currentPageSets[i] ?? []).map((page, i) => page.hasBeenSigned ? i : -1).filter(x => x >= 0);
-              return (
-                <DocumentStep key={i} document={originalDocument} isCurrentDocument={i === currentDocumentPageSetIndex}
-                  currentPageIndex={currentDocumentPageIndex} signedPageIndices={signedPages}
-                  docClicked={() => onDocumentClicked(i)} stepClicked={(step) => onDocumentPageStepClicked(i, step)} />
-              );
-            })
+            generateDocumentSteps()
           }
         </div>
+        { (isLoadingPageSet || offcanvasShowClass) &&
+          <Spinner message="Generating documents..." />
+        }
         { !isLoadingPageSet && !offcanvasShowClass && currentPage &&        
           <div className={styles.SignatureCaptureDocument}>  
             <div className={styles.SignatureCaptureDocumentPane}>
@@ -166,9 +185,6 @@ export const SignatureCapture = ({ context, onQuit, onCompleted }: SignatureCapt
             </div>
           </div>
         }
-        { (isLoadingPageSet || offcanvasShowClass) &&
-          <Spinner message="Generating documents..." />
-        }
       </div>
       <div className={styles.SignatureCaptureFooter}>
         <div className={styles.SignatureCaptureFooterQuit + ' p-2 text-center'}>
@@ -176,15 +192,7 @@ export const SignatureCapture = ({ context, onQuit, onCompleted }: SignatureCapt
         </div>
         <div className={styles.SignatureCaptureFooterProgress}>
           {
-            context.userProfiles.map((user, i) => {
-              const profileCompleted = currentUserIndex > i || (currentUserIndex === i && isLastDocument && isLastPage && !!currentPage?.hasBeenSigned);
-              const completedDocuments = (context.userProfiles[i]?.documentProfiles ?? []).map((_, i) => (profileCompleted || i < currentDocumentPageSetIndex || (i === currentDocumentPageSetIndex && currentPageSetCompleted)) ? i : -1).filter(x => x >= 0);
-              return (
-                <UserProgressStep key={i} userProfile={user} isCurrentProfile={currentUserIndex === i}
-                  isProfileCompleted={profileCompleted} completedDocumentIndices={completedDocuments}
-                  documents={context.documents} currentDocumentIndex={currentDocumentPageSetIndex} />
-              )
-            })
+            generateUserSteps()
           }
         </div>
       </div>

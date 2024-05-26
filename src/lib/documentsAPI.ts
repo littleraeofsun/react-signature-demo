@@ -25,7 +25,7 @@ export function FetchSignatureCaptureDocuments(): Observable<SignatureCaptureCon
       const result = {
         documents: [{ documentKey: mainDocKey, documentDescription: 'Primary Form', ...mainDocData }, { documentKey: ackDocKey, documentDescription: 'Acknowledgment Form', ...ackDocData }],
         userProfiles: [{ // determines WHO is signing the documents
-          profileDescription: 'Offender',
+          profileDescription: 'Client',
           documentProfiles: [{ // determines WHICH documents they sign
             documentKey: mainDocKey,
             signatures: [offenderMainDocSignatureConfig, offenderMainDocLastPageSignatureConfig] // determines HOW they sign this document
