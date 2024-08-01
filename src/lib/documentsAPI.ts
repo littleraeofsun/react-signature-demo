@@ -11,13 +11,18 @@ const processPdf = () => pipe(
   }))
 );
 
-// Arbitrary 
+// Arbitrary paths to documents for the demo (these would normally be retrieved programmatically or derived from config files)
 const mainDocUrl = 'http://127.0.0.1:8080/Primary%20Form.pdf';
 const ackDocUrl = 'http://127.0.0.1:8080/Acknowledgment.pdf';
-const mainDocApi$ = from(fetch(mainDocUrl).then(result => result.arrayBuffer())).pipe(processPdf());
-const ackDocApi$ = from(fetch(ackDocUrl).then(result => result.arrayBuffer())).pipe(processPdf());
+
+// local constants
 const mainDocKey = 'main';
 const ackDocKey = 'ack';
+
+// document sourcing "api" calls (stubs for the demo process)
+const mainDocApi$ = from(fetch(mainDocUrl).then(result => result.arrayBuffer())).pipe(processPdf());
+const ackDocApi$ = from(fetch(ackDocUrl).then(result => result.arrayBuffer())).pipe(processPdf());
+
 
 export function FetchSignatureCaptureDocuments(): Observable<SignatureCaptureContext> {
   return combineLatest([mainDocApi$,ackDocApi$]).pipe(
@@ -50,6 +55,7 @@ export function FetchSignatureCaptureDocuments(): Observable<SignatureCaptureCon
   );
 }
 
+// document signature configurations
 const offenderMainDocSignatureConfig: SignatureProfileConfig = {
   positionX: 378,
   positionY: 32,

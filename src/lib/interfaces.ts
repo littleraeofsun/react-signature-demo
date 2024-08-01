@@ -1,5 +1,6 @@
 import { PDFDocument } from "pdf-lib";
 
+/** Primary DTO for transporting a document signature session */
 export interface SignatureCaptureContext {
   documents: SignatureCaptureDocument[];
   userProfiles: SignatureProfile[];
@@ -37,10 +38,13 @@ export interface SignatureProfileConfig {
   positionY: number;
   width: number;
   height: number;
+  /** This method is called to determine if the current signature should be applied to the page on the document.
+   * Can be a custom method or one of the standard validators below can be used instead.
+   */
   isOnPage: SignatureProfileConfigPageValidator;
 }
 
-
+/** Standard pre-made page validators for `SignatureProfileConfig.isOnPage` property */
 const SignatureIsOnAllPages: SignatureProfileConfigPageValidator = () => true;
 const SignatureIsOnFirstPageOnly: SignatureProfileConfigPageValidator = (index: number) => index === 0;
 const SignatureIsOnLastPageOnly: SignatureProfileConfigPageValidator = (index: number, totalPages: number) => (index + 1) === totalPages;
@@ -50,7 +54,6 @@ const SignatureIsOnOnlyEvenPages: SignatureProfileConfigPageValidator = (index: 
 const SignatureIsOnOnlyOddPages: SignatureProfileConfigPageValidator = (index: number) => (index % 2) !== 0;
 const SignatureIsOnAllButFirstAndLastPages: SignatureProfileConfigPageValidator = (index: number, totalPages: number) => index !== 0 && (index + 1) !== totalPages;
 
-/** Standard pre-made page validators for `SignatureProfileConfig.isOnPage` property */
 export const StandardPageValidators = {
   SignatureIsOnAllPages,
   SignatureIsOnFirstPageOnly,
