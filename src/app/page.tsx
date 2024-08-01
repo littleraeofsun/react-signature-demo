@@ -7,10 +7,12 @@ import { SignatureCapture } from "./components/signature-capture/SignatureCaptur
 import { SignedDocumentResult } from "./components/signature-capture/services/_document.service";
 
 export default function Home() {
+  // state
   const [showDemo, setShowDemo] = useState(false);
   const [context, setContext] = useState({ documents: [], userProfiles: [] } as SignatureCaptureContext);
   const [finalDocs, setFinalDocs] = useState<SignedDocumentResult[]>([]);
 
+  // event handlers
   const onShowDemoClicked = () => {    
     const sub = FetchSignatureCaptureDocuments().subscribe(result => {
       setContext(result);
@@ -34,6 +36,7 @@ export default function Home() {
     window.open(fileUrl, '_blank');
   }
 
+  // local utility methods
   const _convertToArrayBuffer = (data: string) => {
     const binaryString = window.atob(data);
     const bytes = new Uint8Array(binaryString.length);
@@ -69,7 +72,11 @@ export default function Home() {
               <h2 className="mb-3">Document Preview</h2>
               <p>In this demo, you will be walking through a signing process of two documents &#40;<a href="http://127.0.0.1:8080/Primary%20Form.pdf" target="_blank">Primary Form</a>, <a href="http://127.0.0.1:8080/Acknowledgment.pdf" target="_blank">Acknowledgment Form</a>&#41; on behalf of a Client and a Witness.</p>
               <h2 className="my-3">Signed Documents</h2>
-              { finalDocs.length === 0 && <p className="fst-italic">You have not signed any documents yet. Click "Launch Demo" to begin signing.</p> }            
+              { finalDocs.length === 0 && 
+                <p className="fst-italic">
+                  You have not signed any documents yet. Click "Launch Demo" to begin signing.<br/>
+                  <button className="btn btn-primary rounded-pill mt-2" onClick={onShowDemoClicked}>Launch Demo</button>
+                </p> }            
               {
                 finalDocs.map((_, i) => {
                   return (
