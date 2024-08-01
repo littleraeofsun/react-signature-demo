@@ -1,7 +1,17 @@
-import { Observable, Subject, catchError, filter, from, iif, interval, map, of, repeat, switchMap, takeUntil, tap } from "rxjs";
 
-// Again, yes, cutting corners for the demo
+/**
+ * In order to utilize Topaz signature pads with a web application, the client must install and run the Topaz Web Service on their machine.
+ * The methods provided in this file interact with this local service to collect signatures from the device for use within this web app.
+ * 
+ * For instructions in getting the tablet setup, see the README document in the root of this project, or go to
+ *  https://www.topazsystems.com/lcd/t-lbk460.html
+ */
+
+
+import { Subject, filter, interval, map, switchMap, takeUntil, tap } from "rxjs";
+
 // This is the "local" SigWeb service for interacting with the tablet drivers
+// NOTE: This type of value should normally be setup in an environment or config file, but is here for the brevity of the demo
 const apiUrl = 'http://tablet.sigwebtablet.com:47289/SigWeb/';
 
 /** Method for reading property values from the SigWeb driver service (running on the local machine) */
@@ -30,7 +40,7 @@ function setSigWebProperty(property: string) {
   }
 }
 
-// These are the established ways of interacting with the tablet
+// These are the established ways of interacting with the tablet via the service
 const checkSigWebConnection = () => setSigWebProperty('TabletComTest/1');
 const turnTabletOn = () => setSigWebProperty('TabletState/1');
 const turnTabletOff = () => setSigWebProperty('TabletState/0');
@@ -47,9 +57,11 @@ const setDisplayHeight = (height: number) => setSigWebProperty('DisplayYSize/' +
 const setImageWidth = (width: number) => setSigWebProperty('ImageXSize/' + width);
 const setImageHeight = (height: number) => setSigWebProperty('ImageYSize/' + height);
 
-const endCaptureRequested$: Subject<boolean> = new Subject();
-/** Observable subject for streaming the preview image from the tablet when capture state is active. */
+/** Public subject for streaming the preview image from the tablet when capture state is active. */
 export const SignaturePreview$: Subject<Blob> = new Subject();
+
+/** Local subject for stopping the recurring image capture process */
+const endCaptureRequested$: Subject<boolean> = new Subject();
 
 let previousScreenDataPoints = 0;
 /**
