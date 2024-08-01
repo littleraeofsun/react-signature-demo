@@ -4,10 +4,10 @@ import { updateAtIndex } from '@/lib/array.utilities';
 import { BaseSignatureDocument, SignatureCaptureContext, SignatureProfile } from '@/lib/interfaces';
 import { AggregateSignaturePages, GenerateSignaturePages, GeneratedSignaturePage, PrepareDocumentResult, SignedDocumentResult } from './services/_document.service';
 import { Spinner } from '../Spinner';
-import { DocumentStep } from './DocumentStep';
+import { DocumentProgressStep } from './DocumentProgressStep';
 import { UserProgressStep } from './UserProgressStep';
 import { TopazCapture } from './TopazCapture';
-import { DocumentMenu } from './DocumentMenu';
+import { DocumentActionMenu } from './DocumentActionMenu';
 import styles from './SignatureCapture.module.scss';
 import { combineLatest, of } from 'rxjs';
 import { PDFDocument } from 'pdf-lib';
@@ -77,12 +77,12 @@ export const SignatureCapture = ({ context, onQuit, onCompleted }: SignatureCapt
   }, [finalDocs]);
 
   // template producing methods
-  const generateDocumentSteps = () => {
+  const generateDocumentProgressSteps = () => {
     return currentUser?.documentProfiles.map((doc, i) => {
       const originalDocument = context.documents.find(d => d.documentKey === doc.documentKey);
       const signedPages = (currentPageSets[i] ?? []).map((page, i) => page.hasBeenSigned ? i : -1).filter(x => x >= 0);
       return (
-        <DocumentStep key={i} document={originalDocument} isCurrentDocument={i === currentDocumentPageSetIndex}
+        <DocumentProgressStep key={i} document={originalDocument} isCurrentDocument={i === currentDocumentPageSetIndex}
           currentPageIndex={currentDocumentPageIndex} signedPageIndices={signedPages}
           docClicked={() => onDocumentClicked(i)} stepClicked={(step) => onDocumentPageStepClicked(i, step)} />
       );
@@ -160,7 +160,7 @@ export const SignatureCapture = ({ context, onQuit, onCompleted }: SignatureCapt
         <div className={styles.SignatureCaptureProgress + ' p-4'}>
           <p className="h3">{currentUser?.profileDescription} Signatures</p>
           {
-            generateDocumentSteps()
+            generateDocumentProgressSteps()
           }
         </div>
         { (isLoadingPageSet || offcanvasShowClass) &&
@@ -177,7 +177,7 @@ export const SignatureCapture = ({ context, onQuit, onCompleted }: SignatureCapt
             </div>
 
             <div className={styles.SignatureCaptureDocumentActions + ' p-4'}>
-              <DocumentMenu currentPageIndex={currentDocumentPageIndex}
+              <DocumentActionMenu currentPageIndex={currentDocumentPageIndex}
                 currentPageRequiresSignature={currentPageRequiresSignatures}
                 isCurrentPageSigned={!!currentPage?.hasBeenSigned}
                 totalPages={currentDocument?.pageCount ?? 0}

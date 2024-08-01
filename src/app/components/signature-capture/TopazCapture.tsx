@@ -21,12 +21,10 @@ export function TopazCapture({onCompleted}: TopazCaptureProps) {
   // effects
   useEffect(() => {
       SignaturePreview$.subscribe(blob => {
-        console.log('blob: ', blob);
         setPreviewSignature(URL.createObjectURL(blob));
       });
     }, []);
   useEffect(() => {
-      console.log('Capture state changed: ', captureState);
       switch(captureState) {
         case CaptureState.CapturingSignature:
           EndCapture();
@@ -47,7 +45,6 @@ export function TopazCapture({onCompleted}: TopazCaptureProps) {
     _onSignatureAccepted(GetSampleSignature());
   }
   function processFinalSignature(e: any) {
-    console.log(e);
     setFinalSignature(CropOutWhiteSpace(e.target));
   }
   function _onSignatureAccepted(signature: string) {    

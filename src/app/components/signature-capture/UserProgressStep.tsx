@@ -13,7 +13,9 @@ interface UserProgressStepProperties {
 }
 
 export const UserProgressStep = ({userProfile, isCurrentProfile, isProfileCompleted, documents, currentDocumentIndex, completedDocumentIndices}: UserProgressStepProperties) => {
-  if (document) {
+  if (documents) {
+    
+    // build classes
     const mainClasses = [styles.UserProgressStep];
     let title = `Not collecting ${userProfile.profileDescription} signatures yet.`;
     if (isProfileCompleted) {
@@ -24,6 +26,8 @@ export const UserProgressStep = ({userProfile, isCurrentProfile, isProfileComple
       title = `${userProfile.profileDescription} is currently signing documents.`;
       mainClasses.push(styles.CurrentUserStep);
     }
+
+    // method for building user document profile context information
     const buildContext = (docProfile: SignatureProfileDocument, docIndex: number): { document?: SignatureCaptureDocument , classes: string, title: string } => {      
       const document = documents.find(x => x.documentKey === docProfile.documentKey);
       const classes = [styles.UserDocumentStep];
